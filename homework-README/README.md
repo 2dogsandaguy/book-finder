@@ -84,13 +84,13 @@ In order for this application to use a GraphQL API, you’ll need to refactor th
 
 You’ll need to complete the following tasks in each of these back-end files:
 
-* `auth.js`: Update the auth middleware function to work with the GraphQL API.
+* x `auth.js`: Update the auth middleware function to work with the GraphQL API.
 
-* `server.js`: Implement the Apollo Server and apply it to the Express server as middleware.
+* x`server.js`: Implement the Apollo Server and apply it to the Express server as middleware.
 
 * `Schemas` directory:
 
-  * `index.js`: Export your typeDefs and resolvers.
+  * x `index.js`: Export your typeDefs and resolvers.
 
   * `resolvers.js`: Define the query and mutation functionality to work with the Mongoose models.
 
