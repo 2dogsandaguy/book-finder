@@ -24,6 +24,7 @@ const LoginForm = () => {
 
     // check if form has everything (as per react-bootstrap docs)
     const form = event.currentTarget;
+    console.log(form);
     if (form.checkValidity() === false) {
       event.preventDefault();
       event.stopPropagation();
@@ -33,6 +34,7 @@ const LoginForm = () => {
       const { data } = await login({
         variables: { ...userFormData },
       });
+      console.log(data);
 
       // Store the token in local storage
       Auth.login(data.login.token);

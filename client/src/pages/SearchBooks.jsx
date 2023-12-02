@@ -8,8 +8,11 @@ import {
   Row
 } from 'react-bootstrap';
 
+// import hooks for mutations and our mutations
+import { useMutation } from "@apollo/client";
+import { SAVE_BOOK } from "../utils/mutations";
 import Auth from '../utils/auth';
-import { saveBook, searchGoogleBooks } from '../utils/API';
+import { searchGoogleBooks } from '../utils/API';
 import { saveBookIds, getSavedBookIds } from '../utils/localStorage';
 
 const SearchBooks = () => {
@@ -59,6 +62,8 @@ const SearchBooks = () => {
     }
   };
 
+  const [saveBook, { error }] = useMutation(SAVE_BOOK);
+
   // create function to handle saving a book to our database
   const handleSaveBook = async (bookId) => {
     // find the book in `searchedBooks` state by the matching id
@@ -72,16 +77,26 @@ const SearchBooks = () => {
     }
 
     try {
-      const response = await saveBook(bookToSave, token);
+      // execute addUser mutation and pass in variable data from form
+      const { data } = await saveBook({
+        variables: { bookInput: bookToSave },
+      });
 
-      if (!response.ok) {
-        throw new Error('something went wrong!');
+      // Check for errors in the response
+    if (data && data.saveBook && data.saveBook.error) {
+      throw new Error(data.saveBook.error.message);
+    }
+      
+      // save id if successful
+      if (error) {
+        console.error(error);
+        throw new Error("something went wrong!");
       }
 
       // if book successfully saves to user's account, save book id to state
       setSavedBookIds([...savedBookIds, bookToSave.bookId]);
     } catch (err) {
-      console.error(err);
+      console.error('GraphQL Mutation Error:', error.message);
     }
   };
 
