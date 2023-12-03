@@ -12,6 +12,7 @@ import { GET_ME } from "../utils/queries";
 import { REMOVE_BOOK } from "../utils/mutations";
 import Auth from '../utils/auth';
 import { removeBookId } from '../utils/localStorage';
+import { getMe } from '../utils/API';
 
 const SavedBooks = () => {
   const [userData, setUserData] = useState({});
@@ -30,19 +31,41 @@ const SavedBooks = () => {
           return false;
         }
 
-        const response = await GET_ME(token);
+        const response = await getMe(token);
+/*         const responseBody = await response.json();
+
+        console.log('Response Body:', responseBody);
+        console.log('Full response:', response); */
+        
+        console.log('Response:', response);
+        console.log('Content-Type:', response.headers.get('content-type'));
 
         if (!response.ok) {
-          throw new Error('something went wrong!');
+          throw new Error(`Request failed with status: ${response.status}`);
         }
-
+        
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          throw new Error('Invalid content type in the response');
+        }
         const user = await response.json();
-        setUserData(user);
-      } catch (err) {
-        console.error(err);
-      }
-    };
 
+
+      // Check if the response is valid JSON
+      if (user && typeof user === 'object') {
+        setUserData(user);
+      console.log("Response")
+      } 
+      
+      else {
+        console.log("error.message")
+        throw new Error('Invalid response from the server.');
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+    
     getUserData();
   }, [userDataLength]);
 

@@ -79,7 +79,7 @@ const SearchBooks = () => {
     try {
       // execute addUser mutation and pass in variable data from form
       const { data } = await saveBook({
-        variables: { bookInput: bookToSave },
+        variables: { book: bookToSave },
       });
 
       // Check for errors in the response

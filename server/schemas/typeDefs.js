@@ -3,14 +3,12 @@
 // typeDefs
 const typeDefs =`
     type Book {
-        _id: ID
+        bookId: ID
         authors: [String]
         description: String
-        bookId: String
-        image: String
-        forSale: String
-        link: String
         title: String
+        image: String
+        link: String
     }
     type User {
         _id: ID
@@ -20,8 +18,10 @@ const typeDefs =`
         savedBooks: [Book]        
     }
     type Query {
-        me: User
-    }
+    me: User
+    users: [User]
+    user(username: String!): User
+  }
     type Auth {
     token: ID!
     user: User
