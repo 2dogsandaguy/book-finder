@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+
 import {
   Container,
   Card,
@@ -12,92 +12,53 @@ import { GET_ME } from "../utils/queries";
 import { REMOVE_BOOK } from "../utils/mutations";
 import Auth from '../utils/auth';
 import { removeBookId } from '../utils/localStorage';
-import { getMe } from '../utils/API';
+
 
 const SavedBooks = () => {
-  const [userData, setUserData] = useState({});
-  const { loading,  } = useQuery(GET_ME);
+  const { loading, data } = useQuery(GET_ME);
   const [deleteBook] = useMutation(REMOVE_BOOK);
 
-  // use this to determine if `useEffect()` hook needs to run again
-  const userDataLength = Object.keys(userData).length;
-
-  useEffect(() => {
-    const getUserData = async () => {
-      try {
-        const token = Auth.loggedIn() ? Auth.getToken() : null;
-
-        if (!token) {
-          return false;
-        }
-
-        const response = await getMe(token);
-/*         const responseBody = await response.json();
-
-        console.log('Response Body:', responseBody);
-        console.log('Full response:', response); */
-        
-        console.log('Response:', response);
-        console.log('Content-Type:', response.headers.get('content-type'));
-
-        if (!response.ok) {
-          throw new Error(`Request failed with status: ${response.status}`);
-        }
-        
-        const contentType = response.headers.get('content-type');
-        if (!contentType || !contentType.includes('application/json')) {
-          throw new Error('Invalid content type in the response');
-        }
-        const user = await response.json();
-
-
-      // Check if the response is valid JSON
-      if (user && typeof user === 'object') {
-        setUserData(user);
-      console.log("Response")
-      } 
-      
-      else {
-        console.log("error.message")
-        throw new Error('Invalid response from the server.');
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-    
-    getUserData();
-  }, [userDataLength]);
+  // Extract the 'me' object directly from the data
+  const userData = data?.me || {};
 
   // create function that accepts the book's mongo _id value as param and deletes the book from the database
   const handleDeleteBook = async (bookId) => {
     const token = Auth.loggedIn() ? Auth.getToken() : null;
-
+  
     if (!token) {
       return false;
     }
-
+  
     try {
       const response = await deleteBook({
         variables: { bookId },
       });
-
+  
       if (!response.ok) {
-        throw new Error('something went wrong!');
+        console.error('Mutation request failed:', response);
+        throw new Error('Mutation request failed');
       }
-
-      const updatedUser =  response.data;
-      setUserData(updatedUser);
-      // upon success, remove book's id from localStorage
-      removeBookId(bookId);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
+  
+      // Refetch data after successful deletion
+      data.refetch();
+  
+        // Remove book's id from localStorage
+        removeBookId(bookId);
+      } catch (err) {
+        console.error('Error in handleDeleteBook:', err.message);
+        if (err.graphQLErrors) {
+          console.error('GraphQL Errors:', err.graphQLErrors);
+        }
+      }
+    };
+  
+  
+  
   // if data isn't here yet, say so
-  if (!userDataLength || loading) {
+  if (loading) {
     return <h2>LOADING...</h2>;
+  } else {
+    console.log(userData);
   }
 
   return (
