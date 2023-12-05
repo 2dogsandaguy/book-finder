@@ -23,12 +23,12 @@ This full-stack application allows users to search for books, view details about
 
 ## Installation
 * git clone <repository-url>
-  cd bookfinder
-  npm install
+*  cd bookfinder
+*  npm install
 
 Start the Application:
 * npm run dev
-  npm start
+*  npm start
 
 
 ## Usage
